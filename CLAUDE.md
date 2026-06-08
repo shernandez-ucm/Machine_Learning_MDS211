@@ -9,14 +9,14 @@ Course repository for **MDS211 - Machine Learning** at Universidad Católica del
 ## Environment setup
 
 ```bash
-# Activate the included virtual environment (Python 3.12)
+# Activate the included virtual environment (Python 3.14)
 source env/bin/activate
 
 # Or install dependencies globally
 pip install -r requirements.txt
 ```
 
-Dependencies: `numpy`, `matplotlib`, `scikit-learn`, `jupyter`
+Dependencies: `numpy`, `matplotlib`, `scikit-learn`, `jupyter`. Note `requirements.txt` is minimal — `scipy` is also imported (e.g. `scipy.stats.loguniform` in lab 2) but pulled in transitively as a scikit-learn dependency.
 
 ## Running notebooks
 
@@ -33,11 +33,17 @@ jupyter nbconvert --to notebook --execute laboratorios/<notebook>.ipynb --output
 
 ## Repository structure
 
-- `laboratorios/` — Lab notebooks (one per topic, self-contained)
-- `clases/` — PDF lecture slides (introducción, feature engineering, regularización)
+- `laboratorios/` — Lab notebooks (one per topic, self-contained, numbered):
+  - `1.-laboratorio_bayes_optimal.ipynb` — Bayes-optimal classifier via per-class `GaussianMixture`, decision boundaries, KNN comparison
+  - `2.-laboratorio_regularizacion_feature_engineering.ipynb` — high-dimensional regression, `Pipeline` feature engineering, Ridge/Lasso, `RandomizedSearchCV`, SVD multicollinearity diagnosis
+- `clases/` — PDF lecture slides (introducción, feature engineering, regularización, ensambles)
 - `MDS211(Machine Learning).pdf` — Full course reference PDF
 - `env/` — Local virtual environment (not committed in full; `env/` is gitignored except `pyvenv.cfg`)
 
 ## Notebook conventions
 
-Labs follow a numbered section structure (1. Import → 2. Generate data → 3. Train → 4. Visualize → 5. Evaluate). Each section has a markdown cell explaining its purpose before the code cell. Plots use `matplotlib` with `plt.show()` at the end of each visualization block. Models are trained with `random_state=42` and data split 70/30 train/test using `stratify=y`.
+Labs follow a numbered section structure (1. Import → 2. Generate data → 3. Train → 4. Visualize → 5. Evaluate), each preceded by a Spanish markdown cell explaining its purpose. Content (markdown, comments, variable framing) is in Spanish. Plots use `matplotlib` with `plt.show()` at the end of each visualization block.
+
+Reproducibility: fix the seed to `42` on every stochastic call. Lab 1 inlines `random_state=42`; lab 2 defines a `RANDOM_STATE` constant and threads it through `make_regression`, `train_test_split`, `RandomizedSearchCV`, and the estimators — prefer the constant pattern in new notebooks. Data is split train/test with `train_test_split`, using `stratify=y` for classification labs.
+
+Preprocessing in regression labs is wrapped in an sklearn `Pipeline` (`StandardScaler` → `PolynomialFeatures` → estimator) so feature engineering and the model are tuned together; hyperparameters are searched with `RandomizedSearchCV`.
