@@ -1,0 +1,249 @@
+\documentclass[aspectratio=169, 10pt]{beamer}
+
+% ---------- Tema y colores ----------
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{frametitle continuation}{}
+
+\definecolor{StanfordRed}{RGB}{140,21,21}
+\definecolor{StanfordGray}{RGB}{77,77,77}
+\definecolor{LightGray}{RGB}{240,240,240}
+\definecolor{AccentBlue}{RGB}{0,84,166}
+\definecolor{AccentGreen}{RGB}{0,130,100}
+\definecolor{UCMBlue}{RGB}{4, 171, 226}
+\definecolor{UCMNavy}{RGB}{20, 65, 134}
+
+\setbeamercolor{frametitle}{fg=white, bg=UCMBlue}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{author}{fg=white}
+\setbeamercolor{institute}{fg=white!80}
+\setbeamercolor{structure}{fg=UCMBlue}
+\setbeamercolor{block title}{bg=UCMBlue!15!white, fg=UCMBlue}
+\setbeamercolor{block body}{bg=LightGray}
+\setbeamercolor{alerted text}{fg=UCMBlue}
+\setbeamercolor{example text}{fg=UCMBlue}
+
+\setbeamerfont{frametitle}{series=\bfseries, size=\large}
+\setbeamerfont{title}{series=\bfseries, size=\LARGE}
+\setbeamerfont{block title}{series=\bfseries}
+
+% ---------- Paquetes ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[provide=*,spanish]{babel}
+
+\usepackage{amsmath, amssymb, bm}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta, shapes.geometric, positioning, fit, calc,
+                decorations.pathreplacing, backgrounds, shadows, patterns}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+% ---------- Comandos útiles ----------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\MSE}{\operatorname{MSE}}
+\newcommand{\Bias}{\operatorname{Sesgo}}
+\newcommand{\y}{\bm{y}}
+\newcommand{\X}{\bm{X}}
+\newcommand{\bbeta}{\bm{\beta}}
+
+\newcommand{\formula}[1]{%
+  \begin{tcolorbox}[colback=UCMBlue!8, colframe=UCMBlue, arc=4pt,
+                    boxsep=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt]
+  #1
+  \end{tcolorbox}
+}
+
+%\logo{\includegraphics{figures/logotipo_jpg.jpg}}
+% ---------- Portada ----------
+\title{\textbf{Machine Learning}}
+\subtitle{MDS-211 Magister en Data Science}
+\author{Sergio Hernández\\ shernandez@ucm.cl}
+\institute{ \begin{tikzpicture}
+    \clip [rounded corners=1cm] (0,0) rectangle (4,2);
+    \node[anchor=south west, inner sep=0pt] at (0,0) 
+        {\includegraphics[width=4cm, height=2cm]{figures/mindslab.png}};
+\end{tikzpicture}
+\\ \textbf{Universidad Católica del Maule}}
+\date{}
+
+
+\begin{document}
+% --- Título ---
+{
+	\setbeamertemplate{background}{
+		\begin{tikzpicture}[remember picture, overlay]
+			\fill[UCMBlue] (current page.south west) rectangle (current page.north east);
+			\fill[UCMBlue!70!black, opacity=0.5]
+			(current page.south west) -- ++(0,3) -- ++(18,0) -- cycle;
+			\foreach \i in {1,...,40}{
+				\fill[white, opacity=0.04]
+				({random()*17}, {random()*10}) circle ({random()*0.3});
+			}
+		\end{tikzpicture}
+	}
+	\begin{frame}[plain]
+		\vspace{1.2cm}
+		\titlepage
+		\begin{tikzpicture}[remember picture, overlay]
+			\node[white, opacity=0.15, font=\fontsize{80}{80}\selectfont] 
+			at (current page.east) [xshift=-2cm] {$\Sigma$};
+		\end{tikzpicture}
+	\end{frame}
+}
+
+\section{Feature Engineering}
+
+\begin{frame}
+\frametitle{Qu\'e es Feature Engineering?}
+\begin{block}{Definici\'on}
+Es el proceso de crear nuevos descriptores a partir de los datos en bruto, de manera de aumentar el poder predictivo de los algoritmos de miner\'ia de datos.
+\end{block}
+
+\pause
+\begin{itemize}
+\item Datos num\'ericos : representan mediciones cuantitativas, por ejemplo cantidad de casos (valores discretos) o registro de temperaturas (valores continuos). 
+\pause
+\item Datos categ\'oricos : representan valores cualitativos, por ejemplo sexo, estado civil, etc. 
+\pause
+\item Datos ordinales : contiene datos categ\'oricos y num\'ericos, por ejemplo valores de cuestionarios (respuesta 1,2,3,..).
+
+\end{itemize}
+\end{frame}
+
+\section{Datos num\'ericos}
+\begin{frame}
+\frametitle{Transformaci\'on Logaritmica}
+\begin{itemize}
+	\item Es una transformaci\'on mon\'otona ya que cambia la escala pero no la posici\'on relativa del dato. 
+	\pause
+	\item La funci\'on logaritmo comprime el rango de valores altos y expande el rango de valores bajos, por lo tanto permite reducir el sesgo de los datos en bruto. 
+	\begin{align}
+	x= \operatorname{log}_{10}(x)
+	\end{align}
+\end{itemize}
+
+\begin{figure}
+	\includegraphics[width=0.475\linewidth]{figures/skewed_data}
+	\hfill
+	\includegraphics[width=0.475\textwidth]{figures/skewed_data_transform}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Normalizaci\'on}
+\begin{itemize}
+	\item Los modelos basados en expansiones lineales de las entradas son altamente susceptibles al rango de las variables. Algunas transformaciones comunmente usadas son:
+	\begin{itemize}
+		\item \textbf{Escalamiento Min-Max} : Comprime los valores originales al intervalo $[0,1]$.
+		
+		\begin{align}
+		x=\frac{x - \operatorname{min}(x)}{\operatorname{max}(x) - \operatorname{min}(x)}
+		\end{align}
+		\item \textbf{Estandarizaci\'on} : Re-escala los valores originales de modo que tengan media $0$ y  varianza $1$. 
+		
+		\begin{align}
+		x=\frac{x - \operatorname{mean}(x)}{ \sqrt{\operatorname{var}(x)}}
+		\end{align}
+	\end{itemize}
+	 
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Interacciones}
+\begin{itemize}
+	\item Los descriptores de interacci\'on calculan el producto de dos descriptores.
+	\pause
+	\item Por ejemplo si consideramos el siguiente modelo lineal:
+	\begin{align}
+	y=w_0+w_1 x_1 + w_2 x_2 + w_3 x_3 
+	\end{align}
+	\pause
+	\item Es posible crear nuevos descriptores de interacci\'on, combinando las variables de entrada:
+	\begin{align}
+	y=w_0+w_1 x_1 + w_2 x_2 + w_3 x_3 + w_{1,2} x_1 x_2 + w_{1,3} x_1 x_3 + w_{2,3} x_2 x_3
+	\end{align}	
+	
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Polinomios}
+\begin{itemize}
+	\item Los descriptores polinomiales calculan polinomios de orden $p$.
+	\pause
+	\item Por ejemplo si consideramos el siguiente modelo lineal:
+	\begin{align}
+	y=w_0+w_1 x_1 + w_2 x_2 + w_3 x_3 
+	\end{align}
+	\pause
+	\item Es posible crear nuevos descriptores de interacci\'on, combinando las variables de entrada:
+	\begin{align}
+	y=w_0+w_1 x_1 + w_2 x_2 + w_3 x_3 + w_{1,1} x_1^2 + w_{2,2} x_2^2 + w_{3,3} x_3^2
+	\end{align}	
+	
+\end{itemize}
+
+\end{frame}
+
+\section{Datos categ\'oricos}
+\begin{frame}
+\frametitle{One Hot Encoding}
+\begin{itemize}
+	\item One Hot Encoding es una transformaci\'on para variables categoricas que utiliza $1$ bit para cada categor\'ia. 
+	\pause
+	\item Si la variable original contiene $k$ categro\'ias, entonces OHE crea $k$ columnas.
+	\pause
+	\item Las $k$ columnas son dependientes, por lo tanto generalmente se usan las $k-1$ primeras columnas para crear modelos lineales.  
+\end{itemize}
+
+\begin{columns}[t]
+	\begin{column}{0.3\textwidth}
+		\begin{table}[]
+			\begin{tabular}{l|l|l}
+				Id & Ciudad & Renta \\
+				\hline
+				1  & Santiago & 2.5\\
+				2  & Rancagua & 1.3\\
+				3  & Talca   & 1.2 \\
+				4  & Santiago & 1.9
+			\end{tabular}
+		\end{table}
+	\end{column}
+	\begin{column}{0.7\textwidth}  
+	\begin{table}[]
+	\begin{tabular}{l|l|l|l|l}
+		Id & Santiago & Rancagua & Talca & Renta \\
+		\hline
+		1  & 1 & 0 & 0 & 2.5\\
+		2  & 0 & 1 & 0 & 1.3\\
+		3  & 0 & 0 & 1 & 1.2\\
+		4  & 1 & 0 & 0 & 1.9
+	\end{tabular}
+\end{table}
+	\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Automated Feature Engineering}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/features_results_comparison}
+	\caption{FeatureTools \footnote{\url{https://github.com/Featuretools/Automated-Manual-Comparison}}}
+	\label{fig:featuresresultscomparison}
+\end{figure}
+
+\end{frame}
+\end{document}

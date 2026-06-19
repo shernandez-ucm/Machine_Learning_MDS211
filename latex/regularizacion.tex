@@ -1,0 +1,417 @@
+\documentclass[aspectratio=169, 10pt]{beamer}
+
+% ---------- Tema y colores ----------
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{frametitle continuation}{}
+
+\definecolor{StanfordRed}{RGB}{140,21,21}
+\definecolor{StanfordGray}{RGB}{77,77,77}
+\definecolor{LightGray}{RGB}{240,240,240}
+\definecolor{AccentBlue}{RGB}{0,84,166}
+\definecolor{AccentGreen}{RGB}{0,130,100}
+\definecolor{UCMBlue}{RGB}{4, 171, 226}
+\definecolor{UCMNavy}{RGB}{20, 65, 134}
+
+\setbeamercolor{frametitle}{fg=white, bg=UCMBlue}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{author}{fg=white}
+\setbeamercolor{institute}{fg=white!80}
+\setbeamercolor{structure}{fg=UCMBlue}
+\setbeamercolor{block title}{bg=UCMBlue!15!white, fg=UCMBlue}
+\setbeamercolor{block body}{bg=LightGray}
+\setbeamercolor{alerted text}{fg=UCMBlue}
+\setbeamercolor{example text}{fg=UCMBlue}
+
+\setbeamerfont{frametitle}{series=\bfseries, size=\large}
+\setbeamerfont{title}{series=\bfseries, size=\LARGE}
+\setbeamerfont{block title}{series=\bfseries}
+
+% ---------- Paquetes ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[provide=*,spanish]{babel}
+\usepackage{cancel}
+\usepackage{amsmath, amssymb, bm}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta, shapes.geometric, positioning, fit, calc,
+	decorations.pathreplacing, backgrounds, shadows, patterns}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+% ---------- Comandos �tiles ----------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\MSE}{\operatorname{MSE}}
+\newcommand{\Bias}{\operatorname{Sesgo}}
+\newcommand{\y}{\bm{y}}
+\newcommand{\X}{\bm{X}}
+\newcommand{\bbeta}{\bm{\beta}}
+
+\newcommand{\formula}[1]{%
+	\begin{tcolorbox}[colback=UCMBlue!8, colframe=UCMBlue, arc=4pt,
+		boxsep=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt]
+		#1
+	\end{tcolorbox}
+}
+
+%\logo{\includegraphics{figures/logotipo_jpg.jpg}}
+% ---------- Portada ----------
+\title{\textbf{Machine Learning}}
+\subtitle{MDS-211 Magister en Data Science}
+\author{Sergio Hernández\\ shernandez@ucm.cl}
+\institute{ \begin{tikzpicture}
+		\clip [rounded corners=1cm] (0,0) rectangle (4,2);
+		\node[anchor=south west, inner sep=0pt] at (0,0) 
+		{\includegraphics[width=4cm, height=2cm]{figures/mindslab.png}};
+	\end{tikzpicture}
+	\\ \textbf{Universidad Católica del Maule}}
+\date{}
+
+
+\begin{document}
+% --- Título ---
+
+{
+	\setbeamertemplate{background}{
+		\begin{tikzpicture}[remember picture, overlay]
+			\fill[UCMBlue] (current page.south west) rectangle (current page.north east);
+			\fill[UCMBlue!70!black, opacity=0.5]
+			(current page.south west) -- ++(0,3) -- ++(18,0) -- cycle;
+			\foreach \i in {1,...,40}{
+				\fill[white, opacity=0.04]
+				({random()*17}, {random()*10}) circle ({random()*0.3});
+			}
+		\end{tikzpicture}
+	}
+	\begin{frame}[plain]
+		\vspace{1.2cm}
+		\titlepage
+		\begin{tikzpicture}[remember picture, overlay]
+			\node[white, opacity=0.15, font=\fontsize{80}{80}\selectfont] 
+			at (current page.east) [xshift=-2cm] {$\Sigma$};
+		\end{tikzpicture}
+	\end{frame}
+}
+	
+
+\section{Especificaci\'on de Modelos}
+
+
+\begin{frame}
+\frametitle{Aprendizaje Estad\'istico}
+\begin{columns}[T]
+	\column{0.52\textwidth}
+\begin{itemize}
+	\item Dado un conjunto de datos de entrada $\mathbf x \in X$ con $(X_1,\ldots,X_p)$ predictores y una respuesta $y$.
+	\item Suponemos la existencia de una funci\'on $f:X \mapsto Y$ tal que para cada $y$:
+	\formula{\hspace{1.5cm}$y=f(\mathbf x)+\mathcal{E}$
+	}
+	\item El objetivo del aprendizaje estad\'istico es estimar $f$:
+
+
+\end{itemize}
+	\column{0.45\textwidth}
+	\begin{itemize}
+	\item \textbf{Predicci\'on} : Se requiere posible obtener una estimaci\'on $\hat Y$ a partir de un modelo $\hat f$. 
+	\item \textbf{Inferencia} : Se requiere interpretar la relaci\'on entre $X$ y $Y$, por lo tanto el modelo $\hat f$ necesita explicar $Y$ a partir de los datos de entrada $X$.
+\end{itemize} 
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Aprendizaje Estad\'istico}
+\centering \textbf{Modelo de predicci\'on del salario.}
+\begin{columns}[t] % contents are top vertically aligned
+     \begin{column}[T]{3cm}\centering
+     \begin{figure}
+     \includegraphics[scale=.3]{figures/salario-anio}
+	\caption{A\~{n}o}
+     \end{figure}
+     
+     \end{column}
+     \begin{column}[T]{3cm}
+          \begin{figure}
+         \includegraphics[scale=.3]{figures/salario-educacion}
+     	\caption{Nivel educacional}
+          \end{figure} 
+
+     \end{column}
+     \begin{column}[T]{3cm}
+               \begin{figure}                            
+             \includegraphics[scale=.3]{figures/salario-edad}
+          	\caption{Edad}
+               \end{figure} 
+
+          \end{column}
+     \end{columns}
+
+\end{frame}
+
+\section{Modelos Lineales}
+
+\begin{frame}
+\frametitle{M\'axima Verosimilitud}
+\begin{itemize}
+\item En el caso de problemas de regresi\'on simple, es posible ajustar par\'ametros $\mathbf w=[w_0,w_1,\ldots,w_p]$ mediante el criterio de \textit{m\'axima verosimilitud} para sistemas lineales Gaussianos:
+
+\begin{block}{\textbf{Verosimilitud}}
+	\small
+	Es posible determinar los par\'ametros maximizando el negativo del logaritmo de la verosimilitud o mediante el m\'etodo de m\'inimos cuadrados.
+	\begin{align*}
+		y_i&=f(x_i)+\mathcal{\epsilon}\\
+		&=w_0+\sum_{j=1}^{p} w_j x_{ij}+\mathcal{N} (0,\sigma^2)\\
+		p(y_i \vert x_i) &= \mathcal{N} (\mathbf w^T \mathbf x_i,\sigma^2)\\  
+		&= \frac{1}{{\sigma \sqrt {2\pi } }}e^{{{ - \left( {y_i - \mathbf w^T \mathbf x_{i} } \right)^2 } \mathord{\left/ {\vphantom {{ - \left( {x - \mathbf w_j \mathbf x_{ij} } \right)^2 } {2\sigma ^2 }}} \right. \kern-\nulldelimiterspace} {2\sigma ^2 }}}
+	\end{align*} 
+	\[
+	\E\bigl[Y - \hat{Y}\bigr]^2 = \frac{}{}
+	\underbrace{||Y- X\mathbf w^T||^2}_{\text{Reducible}} 
+	- \frac{n}{2}\underbrace{\log{2 \pi \sigma^2}}_{\text{Irreducible}}
+	\]
+\end{block}
+ 
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Estimaci\'on por m\'inimos cuadrados}
+\begin{itemize}
+\item De manera de estimar $\theta=(\mathbf w,\sigma)$, es necesario minimizar la funci\'on de error: 
+\begin{align}
+E(\theta)=\sum_{i=1}^n \Big[ \frac{y_i-w_0-\sum_{j=1}^{p} w_j x_{ij}}{\sigma} \Big]^2
+\end{align}  
+\pause
+\item El m\'inimo de $E$ ocurre cuando: 
+\begin{align}
+\frac{\partial E}{\partial \theta}=0
+\end{align}
+\pause
+\item En general $n>>p$ por lo tanto el gradiente $\frac{\partial E}{\partial \theta}$ induce un sistema de ecuaciones bien definido y una matriz definida positiva (y por lo tanto invertible).
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{ Estimaci\'on por m\'inimos cuadrados}
+ \begin{columns}[T]
+\column{0.48\textwidth}
+\begin{block}{\textbf{Ajuste}}
+	\small
+\begin{align*}
+	\begin{matrix}
+		0&=\frac{\partial E}{\partial w_0}=-2 \sum_{i=1}^n \Big[ \frac{y_i-w_0-\sum_{j=1}^{p} w_j x_{ij}}{\sigma^2}\Big] \\
+		&\ldots \\
+		0&=\frac{\partial E}{\partial w_p}=-2 \sum_{i=1}^n \Big[  \frac{x_i \left(y_i-w_0-\sum_{j=1}^{p} w_j x_{ij}\right)}{\sigma^2}\Big]
+	\end{matrix} 
+	\label{eq:poly-partial}
+\end{align*}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{\textbf{OLS}}
+	\begin{align*}
+		0=\sum_{i=1}^n \frac{y_i \mathbf x_i^T}{\sigma^2} + \mathbf{w}^T \Big(\sum_{i=1}^n \frac{\mathbf x_i \mathbf x_i^T}{\sigma^2}\Big)
+	\end{align*}
+\end{block}
+
+\end{columns}
+\vspace{0.3cm}
+\begin{tcolorbox}[colback=AccentBlue!10, colframe=AccentBlue, arc=4pt,
+	boxsep=1pt, left=5pt, right=5pt, top=3pt, bottom=3pt]
+	\begin{align*}
+		\mathbf{\hat w}=(\mathbf X^T \mathbf X)^{-1} \mathbf X ^T \mathbf{y}
+	\end{align*}
+\end{tcolorbox}
+\pause
+Asumiendo una varianza constante sobre todos los puntos, el estimador de m\'axima verosimilitud es: 
+\begin{align*}
+	\sigma=\frac{\sum_{i=1}^n  \Big[ y_i-w_0-\sum_{j=1}^{p} \hat w_j x_{ij} \Big]^2}{n-p}
+\end{align*}
+
+\end{frame}
+
+
+
+\section{Selecci\'on del Modelo}
+
+\begin{frame}
+\frametitle{Test de Hip\'otesis}
+\begin{itemize}
+\item Queremos determinar si existe alguna relaci\'on entre un grupo de variables independientes $X$ y una variable dependiente $Y$, tal que podemos escribir $\hat y=w_0+w_1 x_1 + \cdots w_p x_p$. La hip\'otesis nula es :
+\begin{align*}
+H_0 : w_0=w_1=\cdots=w_p=0
+\end{align*}
+\pause
+\item La hip\'otesis alternativa es:
+\begin{align*}
+H_1 : \text{al menos existe un coeficiente } w_j>0 
+\end{align*}
+\pause
+\item  Del total de $2^p$ subconjuntos de variables independientes, cu\'al es el que mejor sirve para predecir/explicar la variable de respuesta?
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Selecci\'on de Modelos}
+\begin{itemize}
+\item Dado que necesitamos un modelo para predecir o explicar una variable de salida, necesitamos verificar la capacidad de cada variable independiente para llevar a cabo esta tarea. 
+\pause
+\item Por otra parte, puede que cada variable por si sola no sea capaz de explicar la variable de salida, por lo que debemos considerar un subconjunto de menor dimensionalidad que $X$.  
+\pause
+\item Las estrategias son:
+\begin{itemize}
+\item \textbf{Selecci\'on hacia adelante} : Se comienza con la hip\'otesis nula (intercepto) y se agregan variables que contribuyan a disminiuir el error residual.
+
+\item \textbf{Selecci\'on hacia atr\'as} : Se comienza con todas las variables y se elimina aquella con el m\'inimo valor $p$, o que tenga m\'inima significancia estad\'istica. Se contin\'ua este proceso hasta llegar a alg\'un criterio de parada.
+
+\item \textbf{Estrategias mixtas} Combinaci\'on de selecci\'on hacia adelante y hacia atr\'as.
+\end{itemize}
+ 
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\section{Regularizaci\'on}
+\begin{frame}
+\frametitle{Regularizaci\'on Ridge}
+\begin{itemize}
+	\item Los modelos lineales se basan en combinaciones lineales $y_i=f(\mathbf x_i)$ de las entradas $\mathbf x=[x_1,x_2,\ldots,x_p]$.  
+	\item Cuando la cantidad de variables independientes $p$ es grande, la funci\'on $f(x)$ se sobre-ajusta a los datos y por lo tanto pierde capacidad de generalizaci\'on.
+	\item Una alternativa para controlar el sobre-ajuste es considerar regularizaci\'on usando la norma $\ell_2$:
+	\begin{align*}
+	E(\theta)=\sum_{i=1}^n (y_i-f(\mathbf x_i))^2+ \lambda \sum_{j=1}^p w_j^2
+	\end{align*}
+	\item A medida que crece el valor del par\'ametro $\lambda \mapsto \infty$, los coeficientes $w_j \mapsto 0$ tienden a cero.
+	
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Regresión Ridge}
+	\begin{block}{Aplicable a sistemas sobredeterminados y subdeterminados.}
+		La \textbf{función de pérdida} de la regresión Ridge se define como
+		\[
+		E(\theta) = 
+	\underbrace{||Y- X\mathbf w^T||^2}_{\text{Error de ajuste}} 
+	-  \underbrace{\lambda \bm{w^2}}_{\text{Regularización}}
+	\]
+		donde $\lambda > 0$ es el \textbf{parámetro de regularización}.
+	\end{block}
+	
+	\bigskip
+	\textbf{Solución en forma cerrada} (mediante $\nabla_{\bm{\theta}}E = 0$):
+	\[
+	2X^T(X\bm{w^T} - \bm{y}) + 2\lambda\bm{w} = \bm{\hat w}
+	\quad\Longrightarrow\quad
+	\boxed{\bm{\hat w_{ridge}} = (X^TX + \lambda I)^{-1}X^T\bm{y}}
+	\]
+	
+\end{frame}
+
+% ── Diapositiva: Cambio en los valores propios ────────────────────────────────
+\begin{frame}{Cambio en los Valores Propios}
+	La regresión Ridge \textbf{mejora} los valores propios de $X^TX$.
+	
+	\begin{block}{Descomposición espectral de $X^TX$}
+		\[
+		X^TX = UDV^T \succeq 0,
+		\]
+		donde $U$ = matriz de vectores propios, $D$ = matriz diagonal de valores
+		propios con entradas \emph{no negativas} $d_1 > d_2 > \cdots > d_p > 0$.
+	\end{block}
+	
+	\bigskip
+	Por tanto, $D + \lambda I$ es siempre positiva para cualquier $\lambda > 0$:
+	\[
+	X^TX + \lambda I = U(D + \lambda I)V^T \succ 0 \quad \forall\,\lambda > 0.
+	\]
+	\begin{alertblock}{Conclusión clave}
+		Añadir $\lambda I$ hace que la matriz sea \textbf{invertible}, estabilizando
+		la solución incluso cuando $X^TX$ es singular o está mal condicionada.
+	\end{alertblock}
+\end{frame}
+
+\begin{frame}{Parámetro de Regularización $\lambda$}
+	\[
+	\bm{w_{ridge}} = (X^TX + \lambda I)^{-1}X^T\bm{y}
+	\]
+	\begin{columns}
+		\column{0.45\textwidth}
+		\begin{block}{$\lambda \to 0$}
+			\[
+			\bm{w}\to (X^TX)^{-1}X^T\bm{y}
+			\]
+			Se reduce a mínimos cuadrados ordinarios.\\
+			\[||Y- X\mathbf w^T||^2-  \bcancel{\lambda \bm{||w||^2}}\]
+		\end{block}
+		
+		\column{0.45\textwidth}
+		\begin{block}{$\lambda \to \infty$}
+			\[
+			\bm{w} \to \bm{0}
+			\]
+			Sobre-regularizado; la solución colapsa.\\
+		\[\bcancel{||Y- X\mathbf w^T||^2}-  \lambda \bm{||w||^2}\]
+		\end{block}
+	\end{columns}
+	
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Regularizaci\'on Lasso}
+\begin{itemize}
+	\item La regularizaci\'on bajo la norma $\ell_2$ controla el crecimiento de los coeficientes, haciéndolos cercanos a cero.  
+	\pause
+	\item Una alternativa para hacer algunos de los coeficientes cero  $w_j=0$ es considerar regularizaci\'on usando la norma $\ell_1$:
+	\begin{align*}
+		E=\underbrace{\sum_{i=1}^n (y_i-f(\mathbf x_i))^2}_{\text{Error de ajuste}} + \underbrace{\lambda \sum_{j=1}^p \vert w_j \vert }_{\text{Regularización}}
+	\end{align*}
+	\pause
+	\item A medida que crece el valor del par\'ametro $\lambda \mapsto \infty$, los coeficientes $w_j = 0$ toman el valor cero.
+
+	
+\end{itemize}
+		\begin{alertblock}{Conclusión clave}
+$||\bm{w}||_1=\sum_{j=1}^p \vert w_j \vert$ es la aproximación convexa más cercana a $||\bm{w}||_0$ (número de coeficientes distintos de cero)
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Ventajas y Desventajas}
+	\begin{columns}[t]
+		\column{0.48\textwidth}
+		\begin{block}{Regresión Ridge}
+			\textcolor{green!60!black}{\textbf{(+)}} Solución analítica en forma cerrada. \\
+			\textcolor{green!60!black}{\textbf{(+)}} Garantías teóricas bien establecidas. \\
+			\textcolor{green!60!black}{\textbf{(+)}} Algoritmo simple: una sola ecuación matricial. \\[4pt]
+			\textcolor{red!70!black}{\textbf{(---)}} Interpretabilidad limitada (solución densa). \\
+			\textcolor{red!70!black}{\textbf{(---)}} No aprovecha la estructura de dispersión.
+		\end{block}
+		
+		\column{0.48\textwidth}
+		\begin{block}{LASSO}
+			\textcolor{green!60!black}{\textbf{(+)}} Éxito comprobado en imágenes, voz, etc. \\
+			\textcolor{green!60!black}{\textbf{(+)}} Idóneo para aprendizaje profundo ($\bm\theta$ enorme). \\
+			\textcolor{green!60!black}{\textbf{(+)}} Garantías teóricas en crecimiento. \\
+			\textcolor{green!60!black}{\textbf{(+)}} Algoritmos iterativos eficientes disponibles. \\[4pt]
+			\textcolor{red!70!black}{\textbf{(---)}} Sin solución en forma cerrada. \\
+			\textcolor{red!70!black}{\textbf{(---)}} Requiere métodos iterativos.
+		\end{block}
+	\end{columns}
+\end{frame}
+\end{document}

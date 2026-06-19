@@ -1,0 +1,107 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[sfdefault]{noto}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[left=2.5cm,right=2.5cm,top=3cm,bottom=3cm]{geometry}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+
+% Colores y estilos
+\definecolor{ucmblue}{RGB}{0, 51, 102}
+\titleformat{\section}{\color{ucmblue}\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\color{ucmblue}\large\bfseries}{\thesubsection}{1em}{}
+
+\title{\vspace{-2cm}\color{ucmblue}\textbf{Tarea Práctica: Predicción de Tiempos de Sentencia en el Poder Judicial Chileno}}
+\author{Sergio Hernández\\MDS211 - Machine Learning\\Universidad Católica del Maule}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Objetivo de la Tarea}
+El objetivo de esta evaluación es desarrollar, optimizar y comparar dos enfoques de Machine Learning (Redes Neuronales y Gradient Boosting) para predecir la duración de los procesos judiciales (tiempos de sentencia) utilizando datos reales del Poder Judicial de Chile. Además de la predicción puntual, se requiere una \textbf{evaluación rigurosa de la incertidumbre} asociada a dichas predicciones.
+
+\section{Descripción del Problema y Datos}
+Se utilizarán las estadísticas oficiales del Poder Judicial \footnote{\url{https://numeros.pjud.cl/Estadisticas/Sentencias}}. Los estudiantes deberán recolectar (o descargar) un subconjunto representativo de causas terminadas, utilizando atributos como tipo de tribunal, competencia, materia, región, entre otros.
+
+La variable objetivo ($y$) será el \textbf{tiempo de sentencia} (por ejemplo, calculado como la diferencia en días entre la fecha de ingreso y la fecha de término o sentencia).
+
+\section{Requerimientos y Etapas del Proyecto}
+
+\subsection{1. Recopilación y Preprocesamiento de Datos}
+\begin{itemize}
+    \item \textbf{Limpieza:} Tratamiento de valores nulos, registros duplicados y \textit{outliers} en los tiempos de sentencia (ej. causas anómalamente largas o con errores de digitación).
+    \item \textbf{Ingeniería de Características:} Codificación de variables categóricas (ej. \textit{One-Hot Encoding} o \textit{Feature Hashing} para competencias y materias), transformación de variables temporales y escalado/normalización para el entrenamiento de la Red Neuronal.
+    \item \textbf{Partición:} Separación de datos en conjuntos de Entrenamiento, Validación y Prueba (se sugiere considerar una partición temporal si aplica).
+\end{itemize}
+
+\subsection{2. Modelado y Ajuste de Hiperparámetros}
+Deberá entrenar y optimizar los siguientes modelos:
+\begin{itemize}
+    \item \textbf{Modelo 1: Gradient Boosting.} Puede utilizar implementaciones como XGBoost, LightGBM o CatBoost. Realice una búsqueda de hiperparámetros (ej. tasa de aprendizaje, profundidad del árbol, número de estimadores) utilizando validación cruzada.
+    \item \textbf{Modelo 2: Red Neuronal (Deep Learning).} Diseñe un perceptrón multicapa (MLP) utilizando frameworks como JAX/Flax o PyTorch. Ajuste hiperparámetros como el número de capas, neuronas, funciones de activación, \textit{learning rate} y \textit{batch size}.
+\end{itemize}
+
+\subsection{3. Evaluación de la Incertidumbre}
+Dado que el tiempo de resolución de una causa judicial es altamente estocástico, la predicción puntual es insuficiente.
+\begin{itemize}
+    \item Para \textbf{Gradient Boosting}: Implemente regresión por cuantiles (\textit{Quantile Regression}) para obtener intervalos de predicción (ej. cuantiles 10\% y 90\%).
+    \item Para la \textbf{Red Neuronal}: Implemente una red MLP para estimar los parámetros de una distribución (ej. \textit{Gaussian Log-Likelihood} loss) o utilice librerías de inferencia probabilística como NumPyro \footnote{\url{https://num.pyro.ai/en/stable/getting_started.html}}.
+\end{itemize}
+
+\subsection{4. Análisis y Conclusiones}
+\begin{itemize}
+    \item Compare las métricas de error puntual (RMSE, MAE).
+    \item Compare la calidad de los intervalos de incertidumbre (ej. Cobertura empírica vs. Cobertura nominal, Amplitud promedio del intervalo).
+    \item Discuta qué modelo ofrece una mejor calibración y cuál recomendaría para su implementación en un sistema de apoyo a la gestión de tribunales.
+\end{itemize}
+
+\newpage
+\section{Rúbrica de Evaluación}
+
+La tarea será evaluada con base en la siguiente rúbrica (Puntaje Total: 100 puntos):
+
+\vspace{0.5cm}
+\noindent
+\begin{tabularx}{\textwidth}{>{\hsize=0.2\hsize}X >{\hsize=0.25\hsize}X >{\hsize=0.25\hsize}X >{\hsize=0.3\hsize}X}
+\toprule
+\textbf{Criterio} & \textbf{Insuficiente (0-5 pts)} & \textbf{Adecuado (6-12 pts)} & \textbf{Excelente (13-20 pts)} \\
+\midrule
+\textbf{1. Preprocesamiento} & 
+Manejo deficiente de nulos, sin transformación de variables ni tratamiento de outliers. & 
+Limpieza básica, codificación estándar, pero escalado o ingeniería de características incompleta. & 
+Preprocesamiento exhaustivo, justificación de exclusión de outliers y excelente ingeniería de características. \\
+\addlinespace
+\textbf{2. Implementación de Modelos} & 
+Modelos mal configurados, \textit{data leakage} o errores graves en la compilación de la Red Neuronal. & 
+Ambos modelos corren correctamente, pero la arquitectura de la red es muy simple o el GB no utiliza validación cruzada. & 
+Implementación robusta (idealmente JAX/Flax para NN), uso de buenas prácticas y código optimizado. \\
+\addlinespace
+\textbf{3. Ajuste de Hiperparámetros} & 
+Se utilizan hiperparámetros por defecto sin ninguna estrategia de búsqueda. & 
+Búsqueda empírica básica (\textit{Grid Search} pequeño) sin métricas claras de validación. & 
+Búsqueda sistemática (ej. \textit{Random Search} o \textit{Grid Search}) evaluada con validación cruzada. \\
+\addlinespace
+\textbf{4. Evaluación de Incertidumbre} & 
+No se evalúa la incertidumbre, solo se reportan predicciones puntuales. & 
+Implementación teórica básica de cuantiles o MC Dropout, pero intervalos mal interpretados o no calculados correctamente. & 
+Excelente formulación bayesiana o cuantílica. Cobertura de intervalos calculada y visualizada de forma precisa. \\
+\addlinespace
+\textbf{5. Análisis y Conclusiones} & 
+Conclusiones superficiales, no se comparan adecuadamente los intervalos ni las métricas de error. & 
+Comparación basada solo en MAE/RMSE. Breve mención a la incertidumbre sin profundidad analítica. & 
+Análisis crítico profundo. Discusión clara sobre el equilibrio entre precisión puntual, calidad de la incertidumbre y costo computacional. \\
+\bottomrule
+\end{tabularx}
+
+\vspace{1cm}
+\noindent \textbf{Formato de Entrega:} Se debe entregar un documento en PDF con el informe metodológico y un repositorio (o archivo \texttt{.ipynb}) con el código documentado.
+
+\end{document}
