@@ -3,3 +3,5 @@ matplotlib
 scikit-learn
 jupyter
 jax[cuda12]
+flax
+optax
